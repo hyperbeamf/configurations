@@ -70,7 +70,7 @@
 (use-package sml-mode
   :ensure t)
 
-(use-package diminish ; Prevent cluttering of mode line
+(use-package diminish ; Prevent cluttering of mode line via cluttering of init.el
   :ensure t
   :config
   (require 'diminish)
