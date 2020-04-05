@@ -1,3 +1,4 @@
+! urxvt configs - so far they are extremely small
 URxvt.scrollBar: false
 URxvt.font: xft:Office Code Pro Medium:size=11
 URxvt.letterSpace: -1

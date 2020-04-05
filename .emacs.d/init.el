@@ -66,11 +66,21 @@
   :ensure t)
 (use-package sml-mode
   :ensure t)
+
+(use-package diminish ; Prevent cluttering of mode line
+  :ensure t
+  :config
+  (require 'diminish)
+  (diminish 'theme-magic-export-theme-mode)
+  (diminish 'yas-global-mode)
+  (diminish 'helm-mode))
 ;; Don't make stupid backup files
 (setq make-backup-files nil)
 ;; Require
 (require 'multiple-cursors)
 ;; Bindings
+(global-set-key (kbd "M-x") 'helm-M-x)
+(global-set-key (kbd "C-x C-f") 'helm-find-files)
 (global-set-key (kbd "C-c w k") 'username/kill-word)
 (global-set-key (kbd "C-c M-c") 'mc/edit-lines)
 (global-set-key (kbd "C-c C-z") 'mc/mark-next-like-this)
@@ -184,7 +194,7 @@
     (("unixporn" "https://www.reddit.com/r/unixporn/.rss" nil nil nil))))
  '(package-selected-packages
    (quote
-    (helm yasnippet-snippets company theme-magic sml-mode cider gruber-darker-theme markdown-mode project-explorer projectile multiple-cursors magit rainbow-mode org-bullets paredit slime spacemacs-theme use-package gnu-elpa-keyring-update popwin)))
+    (diminish helm yasnippet-snippets company theme-magic sml-mode cider gruber-darker-theme markdown-mode project-explorer projectile multiple-cursors magit rainbow-mode org-bullets paredit slime spacemacs-theme use-package gnu-elpa-keyring-update popwin)))
  '(pdf-view-midnight-colors (quote ("#b2b2b2" . "#292b2e"))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
