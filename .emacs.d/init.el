@@ -3,12 +3,12 @@
 (require 'package)
 (setq package-enable-at-startup nil)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
-(setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
+(setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3") ; To be honest, I have no idea what this does and just saw it on the emacs subreddit as a 
 (package-initialize)
 ;; load-file
 (load-file "~/.emacs.d/username_functions.el")
 ;; packages
-;;; Systems packages
+;; Systems packages
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package)
@@ -23,11 +23,13 @@
   :ensure t)
 (use-package multiple-cursors
   :ensure t)
-(use-package theme-magic
+(use-package theme-magic ; Export theme to pywal
   :ensure t
   :config
   (require 'theme-magic)
   (theme-magic-export-theme-mode))
+(use-package helm
+  :ensure t)
 (use-package org
   :ensure t)
 (use-package org-bullets
@@ -40,11 +42,12 @@
 (use-package yasnippet
   :ensure t
   :config
-  (yas-global-mode 1))
+  (use-package yasnippet-snippets
+    :ensure t)
+  (yas-reload-all))
 (use-package projectile
   :ensure t)
-;; Possible removal of project-explorer
-(use-package project-explorer
+(use-package project-explorer ;TODO: Remove, possibly?
   :ensure t)
 (use-package markdown-mode
   :ensure t
@@ -53,8 +56,7 @@
          ("\\.md\\'" . markdown-mode)
          ("\\.markdown\\'" . markdown-mode))
   :init (setq markdown-command "multimarkdown"))
-;; Magit - if you don't know magit, it's basically self documenting, and it's fucking great. Basically essential
-(use-package magit
+(use-package magit ; Magit - if you don't know magit, it's basically self documenting, and it's fucking great. Basically essential
   :ensure t)
 (use-package slime
   :ensure t)
@@ -78,6 +80,12 @@
 (global-unset-key (kbd "C-x ^"))
 (global-set-key (kbd "C-x g") 'magit-status)
 (global-set-key (kbd "C-c r") 'project-manager-open)
+(global-set-key (kbd "C-c h") 'helm-command-prefix)
+(global-unset-key (kbd "C-x c"))
+;; Helm
+(require 'helm-config)
+(helm-mode 1)
+(define-key helm-map (kbd "C-z") 'helm-select-action)
 ;;; org-mode
 ;; Org-Bullets
 (require 'org-bullets)
@@ -88,6 +96,9 @@
       org-hide-leading-stars t
       org-pretty-entities t
       org-odd-levels-only t)
+;; Helm
+(require 'helm-config)
+(helm-mode 1)
 ;;;; Programming stuff
 ;; Projectile
 (require 'projectile)
@@ -173,7 +184,7 @@
     (("unixporn" "https://www.reddit.com/r/unixporn/.rss" nil nil nil))))
  '(package-selected-packages
    (quote
-    (company theme-magic sml-mode cider gruber-darker-theme markdown-mode project-explorer projectile multiple-cursors magit rainbow-mode org-bullets paredit slime spacemacs-theme use-package gnu-elpa-keyring-update popwin)))
+    (helm yasnippet-snippets company theme-magic sml-mode cider gruber-darker-theme markdown-mode project-explorer projectile multiple-cursors magit rainbow-mode org-bullets paredit slime spacemacs-theme use-package gnu-elpa-keyring-update popwin)))
  '(pdf-view-midnight-colors (quote ("#b2b2b2" . "#292b2e"))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
