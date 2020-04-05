@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: defparameter-global
+# key: defparg
+# --
+(defparameter *${1:name}* $0)

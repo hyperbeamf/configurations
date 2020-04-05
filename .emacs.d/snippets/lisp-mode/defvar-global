@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: defvar-global
+# key: defvg
+# --
+(defvar *${1:name}* $0)
