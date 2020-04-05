@@ -29,7 +29,10 @@
   (require 'theme-magic)
   (theme-magic-export-theme-mode))
 (use-package helm
-  :ensure t)
+  :ensure t
+  :config
+  (use-package helm-slime ; Helm completion for slime
+    :ensure t))
 (use-package org
   :ensure t)
 (use-package org-bullets
@@ -117,7 +120,7 @@
 (projectile-mode +1)
 (setq projectile-project-search-path '("~/dev/"))
 ;; CL
-(slime-setup '(slime-fancy slime-quicklisp slime-asdf))
+(slime-setup '(slime-fancy slime-quicklisp slime-asdf helm-slime))
 (setq inferior-lisp-program "sbcl")
 (autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
 (defun override-slime-repl-bindings-with-paredit ()
