@@ -3,10 +3,8 @@
 (require 'package)
 (setq package-enable-at-startup nil)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
-(setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3") ; To be honest, I have no idea what this does and just saw it on the emacs subreddit as a 
+(setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3") ; To be honest, I have no idea what this does and just saw it on the emacs subreddit as a fix for something
 (package-initialize)
-;; load-file
-(load-file "~/.emacs.d/username_functions.el")
 ;; packages
 ;; Systems packages
 (unless (package-installed-p 'use-package)
@@ -28,11 +26,19 @@
   :config
   (require 'theme-magic)
   (theme-magic-export-theme-mode))
-(use-package helm
+(use-package ivy
   :ensure t
   :config
-  (use-package helm-slime ; Helm completion for slime
-    :ensure t))
+  ;; Get ivy extras
+  (use-package swiper
+    :ensure t)
+  (use-package counsel
+    :ensure t)
+  ;; Configure ivy
+  (ivy-mode 1)
+  (setq ivy-height 9)
+  (setq ivy-use-virtual-buffers t)
+  (setq ivy-count-format "[%d|%d] "))
 (use-package org
   :ensure t)
 (use-package org-bullets
@@ -41,7 +47,15 @@
 (use-package company
   :ensure t
   :config
-  (add-hook 'after-init-hook 'global-company-mode))
+  (setq company-idle-delay 0)
+  (add-hook 'after-init-hook 'global-company-mode)
+  (use-package slime-company
+    :ensure t))
+(with-eval-after-load 'company
+  (define-key company-active-map (kbd "M-n") nil)
+  (define-key company-active-map (kbd "M-p") nil)
+  (define-key company-active-map (kbd "C-n") 'company-select-next)
+  (define-key company-active-map (kbd "C-p") 'company-select-previous))
 (use-package yasnippet
   :ensure t
   :config
@@ -59,46 +73,58 @@
          ("\\.md\\'" . markdown-mode)
          ("\\.markdown\\'" . markdown-mode))
   :init (setq markdown-command "multimarkdown"))
-(use-package magit ; Magit - if you don't know magit, it's basically self documenting, and it's fucking great. Basically essential
+(use-package nix-mode ; Pretty much only used on NixOS
+  :ensure t
+  :mode "\\.nix\\'")
+(use-package magit
   :ensure t)
 (use-package slime
   :ensure t)
 (use-package paredit
   :ensure t)
-(use-package cider
+(use-package geiser
   :ensure t)
 (use-package sml-mode
   :ensure t)
-
 (use-package diminish ; Prevent cluttering of mode line via cluttering of init.el
   :ensure t
   :config
   (require 'diminish)
   (diminish 'theme-magic-export-theme-mode)
   (diminish 'yas-global-mode)
-  (diminish 'helm-mode))
+  (diminish 'ivy-mode))
 ;; Don't make stupid backup files
 (setq make-backup-files nil)
 ;; Require
 (require 'multiple-cursors)
+(require 'dired-x)
+;;; Word killing function I stole from something
+(defun custom/kill-inner-word ()
+  (interactive)
+  (forward-char 1)
+  (backward-word)
+  (kill-word 1))
 ;; Bindings
-(global-set-key (kbd "M-x") 'helm-M-x)
-(global-set-key (kbd "C-x C-f") 'helm-find-files)
-(global-set-key (kbd "C-c w k") 'username/kill-word)
+(global-set-key (kbd "C-s")     'swiper-isearch)
+(global-set-key (kbd "M-x")     'counsel-M-x)
+(global-set-key (kbd "C-x C-f") 'counsel-find-file)
+(global-set-key (kbd "M-y")     'counsel-yank-pop)
 (global-set-key (kbd "C-c M-c") 'mc/edit-lines)
 (global-set-key (kbd "C-c C-z") 'mc/mark-next-like-this)
 (global-set-key (kbd "C-c C-x") 'mc/mark-previous-like-this)
-(global-set-key (kbd "C-c C-e") 'mc/mark-all-like-this)
-(global-set-key (kbd "C-c v") 'enlarge-window)
-(global-unset-key (kbd "C-x ^"))
-(global-set-key (kbd "C-x g") 'magit-status)
-(global-set-key (kbd "C-c r") 'project-manager-open)
-(global-set-key (kbd "C-c h") 'helm-command-prefix)
+;;(global-set-key (kbd "C-c C-e") 'mc/mark-all-like-this)
+(global-set-key (kbd "C-c v")   'enlarge-window)
+(global-set-key (kbd "C-x g")   'magit-status)
+(global-set-key (kbd "C-c r")   'project-manager-open)
+(global-set-key (kbd "C-c w k") 'custom/kill-inner-word)
+(global-unset-key (kbd "C-r"))
 (global-unset-key (kbd "C-x c"))
-;; Helm
-(require 'helm-config)
-(helm-mode 1)
-(define-key helm-map (kbd "C-z") 'helm-select-action)
+(global-unset-key (kbd "C-x ^"))
+;;; Fix yes or no query
+(defalias 'yes-or-no-p 'y-or-n-p)
+;;; Dired
+(setq dired-recursive-copies 'always)
+(setq dired-recursive-deletes 'top)
 ;;; org-mode
 ;; Org-Bullets
 (require 'org-bullets)
@@ -109,9 +135,6 @@
       org-hide-leading-stars t
       org-pretty-entities t
       org-odd-levels-only t)
-;; Helm
-(require 'helm-config)
-(helm-mode 1)
 ;;;; Programming stuff
 ;; Projectile
 (require 'projectile)
@@ -120,7 +143,7 @@
 (projectile-mode +1)
 (setq projectile-project-search-path '("~/dev/"))
 ;; CL
-(slime-setup '(slime-fancy slime-quicklisp slime-asdf helm-slime))
+(slime-setup '(slime-fancy slime-quicklisp slime-asdf slime-company))
 (setq inferior-lisp-program "sbcl")
 (autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
 (defun override-slime-repl-bindings-with-paredit ()
@@ -162,8 +185,6 @@
 (menu-bar-mode -1)
 (scroll-bar-mode -1)
 
-
-
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -197,11 +218,11 @@
     (("unixporn" "https://www.reddit.com/r/unixporn/.rss" nil nil nil))))
  '(package-selected-packages
    (quote
-    (diminish helm yasnippet-snippets company theme-magic sml-mode cider gruber-darker-theme markdown-mode project-explorer projectile multiple-cursors magit rainbow-mode org-bullets paredit slime spacemacs-theme use-package gnu-elpa-keyring-update popwin)))
+    (counsel ivy slime-company geiser nix-mode diminish yasnippet-snippets company theme-magic sml-mode gruber-darker-theme markdown-mode project-explorer projectile multiple-cursors magit rainbow-mode org-bullets paredit slime spacemacs-theme use-package gnu-elpa-keyring-update popwin)))
  '(pdf-view-midnight-colors (quote ("#b2b2b2" . "#292b2e"))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :stipple nil :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 98 :width normal :foundry "ADBO" :family "Office Code Pro Medium")))))
+ '(default ((t (:inherit nil :stipple nil :background "#181818" :foreground "#e4e4ef" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 98 :width normal :foundry "NATH" :family "Office Code Pro Medium")))))

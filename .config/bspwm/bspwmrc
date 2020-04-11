@@ -27,4 +27,4 @@ bspc config presel_feedback_color "$color8"
 
 compton
 xrdb ~/.Xresources
-feh --bg-fill ~/Wallpapers/wallhaven-0j6r1p_1920x1080.png
+feh --bg-fill ~/Pictures/Wallpapers/wallhaven-0j6r1p_1920x1080.png
